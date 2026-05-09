@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - SISTec IoT Application 2026</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gray-900 text-white font-sans antialiased" onload="initDashboard()">
+
+    <!-- Navbar -->
+    <nav class="glass-card m-4 px-6 py-4 flex justify-between items-center sticky top-4 z-50">
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center font-bold text-xl shadow-lg">
+                S
+            </div>
+            <h1 class="text-xl font-bold tracking-wider">SISTec IoT <span class="text-blue-400">2026</span></h1>
+        </div>
+        <div class="flex items-center space-x-6">
+            <div class="hidden md:block">
+                <span class="text-gray-400 text-sm">Welcome,</span>
+                <span id="userNameDisplay" class="font-semibold text-blue-300">User</span>
+            </div>
+            <button id="logoutBtn" class="btn-danger text-sm">Logout</button>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 py-8 space-y-8">
+        
+        <!-- SECTION 1: LIVE SENSOR CARDS -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Temperature Card -->
+            <div class="glass-card p-6 flex flex-col items-center justify-center relative overflow-hidden group">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-blue-500 rounded-full blur-3xl opacity-20 group-hover:opacity-40 transition duration-500"></div>
+                <h2 class="text-gray-400 font-semibold mb-2 uppercase tracking-wide">Temperature</h2>
+                <div class="text-6xl font-bold text-blue-400 my-4" id="tempValue">--°C</div>
+                <p class="text-gray-500 text-sm" id="tempTime">-- | --</p>
+            </div>
+
+            <!-- Humidity Card -->
+            <div class="glass-card p-6 flex flex-col items-center justify-center relative overflow-hidden group">
+                <div class="absolute top-0 left-0 w-32 h-32 bg-green-500 rounded-full blur-3xl opacity-20 group-hover:opacity-40 transition duration-500"></div>
+                <h2 class="text-gray-400 font-semibold mb-2 uppercase tracking-wide">Humidity</h2>
+                <div class="text-6xl font-bold text-green-400 my-4" id="humValue">--%</div>
+                <p class="text-gray-500 text-sm" id="humTime">-- | --</p>
+            </div>
+        </section>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- SECTION 2: LCD DISPLAY MESSAGE -->
+            <section class="lg:col-span-1 glass-card p-6">
+                <h2 class="text-xl font-bold mb-6 flex items-center">
+                    <span class="w-2 h-6 bg-blue-500 rounded mr-3"></span>
+                    LCD Controller
+                </h2>
+                <div class="bg-black bg-opacity-50 p-4 rounded-lg mb-6 font-mono text-center border border-gray-700 shadow-inner">
+                    <p class="text-green-400 text-xl tracking-widest uppercase" id="currentLcdText">FETCHING...</p>
+                </div>
+                <form id="lcdForm" class="space-y-4">
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-2">New Message (Max 16 Chars)</label>
+                        <input type="text" id="lcdInput" maxlength="16" class="input-field font-mono uppercase" placeholder="HELLO WORLD" required>
+                    </div>
+                    <button type="submit" class="btn-primary w-full py-3">Send to Display</button>
+                </form>
+            </section>
+
+            <!-- SECTION 4: BLYNK LED CONTROL -->
+            <section class="lg:col-span-2 glass-card p-6">
+                <h2 class="text-xl font-bold mb-6 flex items-center">
+                    <span class="w-2 h-6 bg-yellow-500 rounded mr-3"></span>
+                    Device Control (Blynk)
+                </h2>
+                <div class="flex flex-col sm:flex-row gap-6 items-center justify-center h-48 bg-gray-800 bg-opacity-40 rounded-xl border border-gray-700">
+                    <button onclick="controlLed('on')" class="btn-success w-48 py-4 text-xl shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_30px_rgba(16,185,129,0.6)]">
+                        Turn ON LED
+                    </button>
+                    <button onclick="controlLed('off')" class="btn-danger w-48 py-4 text-xl shadow-[0_0_20px_rgba(239,68,68,0.3)] hover:shadow-[0_0_30px_rgba(239,68,68,0.6)]">
+                        Turn OFF LED
+                    </button>
+                </div>
+                <p class="text-center text-gray-500 text-sm mt-4">Controls Virtual Pin V0 on your configured ESP8266 device via Blynk Cloud.</p>
+            </section>
+
+        </div>
+
+        <!-- SECTION 3: SENSOR HISTORY TABLE -->
+        <section class="glass-card p-6 overflow-hidden">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold flex items-center">
+                    <span class="w-2 h-6 bg-purple-500 rounded mr-3"></span>
+                    Sensor Data History
+                </h2>
+                <button onclick="fetchHistory()" class="text-gray-400 hover:text-white transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="overflow-x-auto rounded-lg border border-gray-700">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-gray-800 text-gray-300 text-sm uppercase tracking-wider">
+                            <th class="p-4 border-b border-gray-700">#</th>
+                            <th class="p-4 border-b border-gray-700">Temp</th>
+                            <th class="p-4 border-b border-gray-700">Humidity</th>
+                            <th class="p-4 border-b border-gray-700">LCD Message</th>
+                            <th class="p-4 border-b border-gray-700">Time</th>
+                            <th class="p-4 border-b border-gray-700">Date</th>
+                            <th class="p-4 border-b border-gray-700">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTableBody" class="text-gray-300">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- App Script -->
+    <script src="app.js"></script>
+</body>
+</html>

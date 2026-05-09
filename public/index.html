@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - SISTec IoT Application 2026</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="flex items-center justify-center min-h-screen">
+
+    <div class="glass-card p-8 w-full max-w-md animate-fade-in shadow-2xl">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-blue-400 mb-2">SISTec IoT 2026</h1>
+            <p class="text-gray-400 text-sm">Sign in to access your dashboard</p>
+        </div>
+
+        <form id="loginForm" class="space-y-6">
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-1">Email Address</label>
+                <input type="email" id="email" required class="input-field" placeholder="student@sistec.ac.in">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-1">Password</label>
+                <input type="password" id="password" required class="input-field" placeholder="••••••••">
+            </div>
+
+            <button type="submit" class="btn-primary w-full py-3 mt-4 text-lg">Login</button>
+        </form>
+
+        <p class="mt-6 text-center text-gray-400 text-sm">
+            Don't have an account? <a href="register.html" class="text-blue-400 hover:text-blue-300 font-semibold transition">Register here</a>
+        </p>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const res = await fetch('/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    window.location.href = 'dashboard.html';
+                } else {
+                    alert(data.error || 'Login failed');
+                }
+            } catch (err) {
+                alert('Network error. Is server running?');
+            }
+        });
+    </script>
+</body>
+</html>
