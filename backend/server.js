@@ -62,7 +62,7 @@ app.post('/register', async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = { id: Date.now().toString(), name, email, password: hashedPassword };
-    
+
     db.users.push(newUser);
     writeDB(db);
 
@@ -107,13 +107,13 @@ app.get('/api/auth-status', (req, res) => {
 // ESP8266 posts data here
 app.post('/api/sensor-data', (req, res) => {
     const { temperature, humidity } = req.body;
-    
+
     if (temperature === undefined || humidity === undefined) {
-         return res.status(400).json({ error: 'Missing data' });
+        return res.status(400).json({ error: 'Missing data' });
     }
 
     let db = readDB();
-    
+
     // Create Date and Time in Asia/Kolkata timezone
     const now = new Date();
     const dateStr = now.toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata' });
@@ -185,12 +185,12 @@ app.post('/api/lcd-message', (req, res) => {
 // BLYNK LED CONTROL APIs
 // =======================
 // Replace this token with your actual Blynk Auth Token
-const BLYNK_TOKEN = "YOUR_BLYNK_AUTH_TOKEN"; 
+const BLYNK_TOKEN = "KPOTaW6EXO--p8l2DQUJR2TFRt8om-o6";
 
 app.post('/api/led/:state', async (req, res) => {
     const state = req.params.state === 'on' ? '1' : '0';
     try {
-        const url = `https://blynk.cloud/external/api/update?token=${BLYNK_TOKEN}&V0=${state}`;
+        const url = `https://blynk.cloud/external/api/update?token=${BLYNK_TOKEN}&D12=${state}`;
         await axios.get(url);
         res.json({ message: `LED turned ${req.params.state.toUpperCase()}` });
     } catch (err) {
